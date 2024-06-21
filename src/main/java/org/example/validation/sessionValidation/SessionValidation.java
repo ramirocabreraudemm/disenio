@@ -1,10 +1,10 @@
-package org.example.service;
+package org.example.validation.sessionValidation;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginAttemptService {
+public class SessionValidation {
     private final int MAX_ATTEMPTS = 5;
     private final long LOCK_TIME_DURATION = 300000; // 5 minutos en milisegundos
     private Map<String, LoginAttempt> attempts = new HashMap<>();

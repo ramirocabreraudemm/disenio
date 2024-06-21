@@ -1,4 +1,4 @@
-package org.example.validation;
+package org.example.validation.passwordValidation;
 
 public class LengthValidation implements PasswordValidationStrategy {
     private int minLength;

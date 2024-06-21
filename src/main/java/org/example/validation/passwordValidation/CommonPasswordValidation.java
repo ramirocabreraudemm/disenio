@@ -1,4 +1,4 @@
-package org.example.validation;
+package org.example.validation.passwordValidation;
 
 import java.io.BufferedReader;
 import java.io.IOException;

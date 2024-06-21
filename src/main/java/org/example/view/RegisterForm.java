@@ -2,10 +2,7 @@ package org.example.view;
 
 import org.example.model.User;
 import org.example.service.UserService;
-import org.example.validation.CommonPasswordValidation;
-import org.example.validation.ComplexityValidation;
-import org.example.validation.LengthValidation;
-import org.example.validation.PasswordValidator;
+import org.example.validation.passwordValidation.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -73,7 +70,7 @@ public class RegisterForm extends JDialog {
         passwordValidator.addStrategy(new LengthValidation(12));
         passwordValidator.addStrategy(new ComplexityValidation());
         passwordValidator.addStrategy(new CommonPasswordValidation("common-passwords.txt"));
-        passwordValidator.addStrategy(new CommonPasswordValidation("top-10000-passwords.txt"));
+        passwordValidator.addStrategy(new WeakPasswordValidation("top-10000-passwords.txt"));
 
         if (!passwordValidator.validate(password)) {
             JOptionPane.showMessageDialog(this, "La contraseña no cumple con los criterios", "Error", JOptionPane.ERROR_MESSAGE);

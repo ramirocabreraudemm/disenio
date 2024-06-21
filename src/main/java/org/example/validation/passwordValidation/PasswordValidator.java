@@ -1,4 +1,4 @@
-package org.example.validation;
+package org.example.validation.passwordValidation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.Student;
 import org.example.model.User;
+import org.example.validation.sessionValidation.SessionValidation;
 import org.example.util.PasswordUtil;
 
 import javax.persistence.EntityManager;
@@ -14,14 +15,14 @@ import java.util.List;
 public class UserService {
 
     private EntityManagerFactory entityManagerFactory;
-    private LoginAttemptService loginAttemptService;
+    private SessionValidation sessionValidation;
 
     private User authenticatedUser; // Este es el usuario autenticado actual
 
 
     public UserService() {
         this.entityManagerFactory = Persistence.createEntityManagerFactory("default"); // Asegúrate de que el nombre coincide con el de tu persistence-unit
-        this.loginAttemptService = new LoginAttemptService();
+        this.sessionValidation = new SessionValidation();
 
     }
 
@@ -30,8 +31,8 @@ public class UserService {
     }
 
     public User findUserByUsernameAndPassword(String username, String password) {
-        if (loginAttemptService.isBlocked(username)) {
-            long remainingLockTime = loginAttemptService.getRemainingLockTime(username);
+        if (sessionValidation.isBlocked(username)) {
+            long remainingLockTime = sessionValidation.getRemainingLockTime(username);
             System.out.println("Usuario temporalmente bloqueado. Intente nuevamente en " + remainingLockTime / 1000 + " segundos.");
             return null;
         }
@@ -45,13 +46,13 @@ public class UserService {
             user = query.getSingleResult();
 
             if (user != null && PasswordUtil.checkPassword(password, user.getPassword())) {
-                loginAttemptService.loginSucceeded(username);
+                sessionValidation.loginSucceeded(username);
             } else {
-                loginAttemptService.loginFailed(username);
+                sessionValidation.loginFailed(username);
                 user = null;
             }
         } catch (Exception e) {
-            loginAttemptService.loginFailed(username);
+            sessionValidation.loginFailed(username);
             e.printStackTrace();
         } finally {
             em.close();
@@ -136,23 +137,23 @@ public class UserService {
     }
 
     public void loginSucceeded(String username) {
-        loginAttemptService.loginSucceeded(username);
+        sessionValidation.loginSucceeded(username);
     }
 
     public void loginFailed(String username) {
-        loginAttemptService.loginFailed(username);
+        sessionValidation.loginFailed(username);
     }
 
     public boolean isBlocked(String username) {
-        return loginAttemptService.isBlocked(username);
+        return sessionValidation.isBlocked(username);
     }
 
     public long getRemainingLockTime(String username) {
-        return loginAttemptService.getRemainingLockTime(username);
+        return sessionValidation.getRemainingLockTime(username);
     }
 
     public int getRemainingAttempts(String username) {
-        return loginAttemptService.getRemainingAttempts(username);
+        return sessionValidation.getRemainingAttempts(username);
     }
 
 

@@ -1,4 +1,4 @@
-package org.example.validation;
+package org.example.validation.passwordValidation;
 
 import org.example.model.User;
 import org.example.service.UserService;
