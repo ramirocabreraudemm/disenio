@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class WeakPasswordValidation implements PasswordValidationStrategy {
-    private Set<String> commonPasswords;
+    private Set<String> weakPasswords;
 
     public WeakPasswordValidation(String filePath) {
-        this.commonPasswords = loadCommonPasswords(filePath);
+        this.weakPasswords = loadCommonPasswords(filePath);
     }
 
     private Set<String> loadCommonPasswords(String filePath) {
@@ -30,6 +30,6 @@ public class WeakPasswordValidation implements PasswordValidationStrategy {
 
     @Override
     public boolean isValid(String password) {
-        return password != null && !commonPasswords.contains(password);
+        return password != null && !weakPasswords.contains(password);
     }
 }
