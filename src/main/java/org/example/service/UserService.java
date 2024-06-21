@@ -136,14 +136,6 @@ public class UserService {
         return students;
     }
 
-    public void loginSucceeded(String username) {
-        sessionValidation.loginSucceeded(username);
-    }
-
-    public void loginFailed(String username) {
-        sessionValidation.loginFailed(username);
-    }
-
     public boolean isBlocked(String username) {
         return sessionValidation.isBlocked(username);
     }
@@ -155,7 +147,6 @@ public class UserService {
     public int getRemainingAttempts(String username) {
         return sessionValidation.getRemainingAttempts(username);
     }
-
 
     public void close() {
         entityManagerFactory.close();
