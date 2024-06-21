@@ -14,11 +14,15 @@ import java.util.List;
 public class UserService {
 
     private EntityManagerFactory entityManagerFactory;
+    private LoginAttemptService loginAttemptService;
+
     private User authenticatedUser; // Este es el usuario autenticado actual
 
 
     public UserService() {
         this.entityManagerFactory = Persistence.createEntityManagerFactory("default"); // Asegúrate de que el nombre coincide con el de tu persistence-unit
+        this.loginAttemptService = new LoginAttemptService();
+
     }
 
     public User getAuthenticatedUser() {
@@ -26,6 +30,12 @@ public class UserService {
     }
 
     public User findUserByUsernameAndPassword(String username, String password) {
+        if (loginAttemptService.isBlocked(username)) {
+            long remainingLockTime = loginAttemptService.getRemainingLockTime(username);
+            System.out.println("Usuario temporalmente bloqueado. Intente nuevamente en " + remainingLockTime / 1000 + " segundos.");
+            return null;
+        }
+
         EntityManager em = entityManagerFactory.createEntityManager();
         User user = null;
 
@@ -34,10 +44,14 @@ public class UserService {
             query.setParameter("username", username);
             user = query.getSingleResult();
 
-            if (user != null && !PasswordUtil.checkPassword(password, user.getPassword())) {
+            if (user != null && PasswordUtil.checkPassword(password, user.getPassword())) {
+                loginAttemptService.loginSucceeded(username);
+            } else {
+                loginAttemptService.loginFailed(username);
                 user = null;
             }
         } catch (Exception e) {
+            loginAttemptService.loginFailed(username);
             e.printStackTrace();
         } finally {
             em.close();
@@ -120,6 +134,27 @@ public class UserService {
         }
         return students;
     }
+
+    public void loginSucceeded(String username) {
+        loginAttemptService.loginSucceeded(username);
+    }
+
+    public void loginFailed(String username) {
+        loginAttemptService.loginFailed(username);
+    }
+
+    public boolean isBlocked(String username) {
+        return loginAttemptService.isBlocked(username);
+    }
+
+    public long getRemainingLockTime(String username) {
+        return loginAttemptService.getRemainingLockTime(username);
+    }
+
+    public int getRemainingAttempts(String username) {
+        return loginAttemptService.getRemainingAttempts(username);
+    }
+
 
     public void close() {
         entityManagerFactory.close();

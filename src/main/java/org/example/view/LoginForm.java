@@ -39,6 +39,15 @@ public class LoginForm extends JDialog {
                 String username = tfUsername.getText();
                 String password = String.valueOf(pfPassword.getPassword());
 
+                if (userService.isBlocked(username)) {
+                    long remainingLockTime = userService.getRemainingLockTime(username);
+                    JOptionPane.showMessageDialog(LoginForm.this,
+                            "Usuario temporalmente bloqueado. Intente nuevamente en " + remainingLockTime / 1000 + " segundos.",
+                            "Usuario Bloqueado",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 user = userService.findUserByUsernameAndPassword(username, password);
 
                 if(user != null){
@@ -46,10 +55,20 @@ public class LoginForm extends JDialog {
                     new MainForm(user);
                 }
                 else{
-                    JOptionPane.showMessageDialog(LoginForm.this,
-                            "Usuario o contraseña inválidos",
-                            "Intente de nuevo",
-                            JOptionPane.ERROR_MESSAGE);
+                    int remainingAttempts = userService.getRemainingAttempts(username);
+
+                    if (remainingAttempts > 0) {
+                        JOptionPane.showMessageDialog(LoginForm.this,
+                                "Usuario o contraseña inválidos. Tiene " + remainingAttempts + " intentos.",
+                                "Intente nuevamente",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(LoginForm.this,
+                                "Usuario bloqueado",
+                                "Intente nuevamente",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+
                 }
             }
         });
